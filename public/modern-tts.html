@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Text-to-Speech</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0c0c1e 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #533483 100%);
+            background-attachment: fixed;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(79, 172, 254, 0.2);
+            border-radius: 2rem;
+            padding: 3rem;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+        }
+
+        .title {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #4facfe, #8e44ad);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 2rem;
+        }
+
+        .text-input {
+            width: 100%;
+            min-height: 150px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(79, 172, 254, 0.3);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            color: #ffffff;
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+            outline: none;
+            transition: all 0.3s ease;
+            overflow-y: auto;
+            overflow-x: hidden;
+            word-break: break-word;
+            white-space: pre-wrap;
+            margin-bottom: 2rem;
+        }
+
+        .text-input:focus {
+            border-color: #4facfe;
+            box-shadow: 0 0 20px rgba(79, 172, 254, 0.3);
+        }
+
+        .text-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .audio-player {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(79, 172, 254, 0.2);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .waveform {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 3px;
+            height: 40px;
+            margin-bottom: 1.5rem;
+        }
+
+        .wave-bar {
+            width: 4px;
+            height: 15px;
+            background: linear-gradient(to top, #4facfe, #8e44ad);
+            border-radius: 2px;
+            animation: waveIdle 2s ease-in-out infinite;
+        }
+
+        .wave-bar:nth-child(1) { animation-delay: 0s; }
+        .wave-bar:nth-child(2) { animation-delay: 0.1s; }
+        .wave-bar:nth-child(3) { animation-delay: 0.2s; }
+        .wave-bar:nth-child(4) { animation-delay: 0.3s; }
+        .wave-bar:nth-child(5) { animation-delay: 0.4s; }
+        .wave-bar:nth-child(6) { animation-delay: 0.5s; }
+
+        .waveform.playing .wave-bar {
+            animation: waveActive 0.6s ease-in-out infinite;
+        }
+
+        .waveform.paused .wave-bar {
+            animation-play-state: paused;
+        }
+
+        @keyframes waveIdle {
+            0%, 100% { height: 15px; opacity: 0.4; }
+            50% { height: 25px; opacity: 0.7; }
+        }
+
+        @keyframes waveActive {
+            0%, 100% { height: 20px; opacity: 0.8; }
+            50% { height: 35px; opacity: 1; }
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .control-btn {
+            width: 60px;
+            height: 60px;
+            border: none;
+            border-radius: 50%;
+            background: rgba(79, 172, 254, 0.2);
+            border: 2px solid rgba(79, 172, 254, 0.4);
+            color: #4facfe;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .control-btn:hover {
+            background: rgba(79, 172, 254, 0.3);
+            box-shadow: 0 0 20px rgba(79, 172, 254, 0.4);
+            transform: scale(1.05);
+        }
+
+        .control-btn.primary {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #4facfe, #8e44ad);
+            border: none;
+            box-shadow: 0 10px 30px rgba(79, 172, 254, 0.4);
+        }
+
+        .control-btn.primary:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 40px rgba(79, 172, 254, 0.6);
+        }
+
+        .control-btn i {
+            width: 24px;
+            height: 24px;
+            color: white;
+        }
+
+        .timer {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #4facfe;
+            text-shadow: 0 0 10px rgba(79, 172, 254, 0.5);
+            font-family: 'Courier New', monospace;
+        }
+
+        .generate-btn {
+            width: 100%;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #4facfe, #8e44ad);
+            border: none;
+            border-radius: 1.5rem;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(79, 172, 254, 0.4);
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(79, 172, 254, 0.6);
+        }
+
+        .generate-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 2rem;
+                margin: 1rem;
+            }
+            
+            .title {
+                font-size: 1.5rem;
+            }
+            
+            .controls {
+                gap: 0.5rem;
+            }
+            
+            .control-btn {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .control-btn.primary {
+                width: 70px;
+                height: 70px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">Text-to-Speech</h1>
+        
+        <textarea 
+            id="textInput" 
+            class="text-input"
+            placeholder="Enter your text here to convert to speech..."
+        ></textarea>
+        
+        <div class="audio-player">
+            <div class="waveform" id="waveform">
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+            </div>
+            
+            <div class="controls">
+                <button class="control-btn" id="stopBtn" onclick="stopAudio()">
+                    <i data-lucide="square"></i>
+                </button>
+                
+                <button class="control-btn primary" id="playBtn" onclick="togglePlayPause()">
+                    <i data-lucide="play" id="playIcon"></i>
+                </button>
+            </div>
+            
+            <div class="timer" id="timer">00:00</div>
+        </div>
+        
+        <button class="generate-btn" onclick="generateSpeech()">
+            Generate Speech
+        </button>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        
+        let currentUtterance = null;
+        let isPlaying = false;
+        let isPaused = false;
+        let startTime = 0;
+        let pausedTime = 0;
+        let timerInterval = null;
+        
+        function generateSpeech() {
+            const text = document.getElementById('textInput').value.trim();
+            if (!text) {
+                alert('Please enter some text first');
+                return;
+            }
+            
+            if ('speechSynthesis' in window) {
+                stopAudio();
+                currentUtterance = new SpeechSynthesisUtterance(text);
+                currentUtterance.rate = 1;
+                currentUtterance.pitch = 1;
+                currentUtterance.volume = 1;
+                
+                currentUtterance.onend = () => {
+                    stopAudio();
+                };
+                
+                // Auto-play after generation
+                playAudio();
+            } else {
+                alert('Speech synthesis not supported in this browser');
+            }
+        }
+        
+        function togglePlayPause() {
+            if (!currentUtterance) {
+                generateSpeech();
+                return;
+            }
+            
+            if (isPlaying && !isPaused) {
+                pauseAudio();
+            } else {
+                playAudio();
+            }
+        }
+        
+        function playAudio() {
+            if (!currentUtterance) return;
+            
+            if (isPaused) {
+                speechSynthesis.resume();
+                startTime = Date.now() - pausedTime;
+            } else {
+                speechSynthesis.speak(currentUtterance);
+                startTime = Date.now();
+                pausedTime = 0;
+            }
+            
+            document.getElementById('waveform').classList.add('playing');
+            document.getElementById('waveform').classList.remove('paused');
+            document.getElementById('playIcon').setAttribute('data-lucide', 'pause');
+            lucide.createIcons();
+            
+            startTimer();
+            isPlaying = true;
+            isPaused = false;
+        }
+        
+        function pauseAudio() {
+            if (isPlaying) {
+                speechSynthesis.pause();
+                document.getElementById('waveform').classList.add('paused');
+                document.getElementById('playIcon').setAttribute('data-lucide', 'play');
+                lucide.createIcons();
+                
+                clearInterval(timerInterval);
+                pausedTime = Date.now() - startTime;
+                isPaused = true;
+            }
+        }
+        
+        function stopAudio() {
+            speechSynthesis.cancel();
+            document.getElementById('waveform').classList.remove('playing', 'paused');
+            document.getElementById('playIcon').setAttribute('data-lucide', 'play');
+            lucide.createIcons();
+            
+            clearInterval(timerInterval);
+            document.getElementById('timer').textContent = '00:00';
+            
+            isPlaying = false;
+            isPaused = false;
+            pausedTime = 0;
+        }
+        
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const minutes = Math.floor(elapsed / 60);
+                const seconds = elapsed % 60;
+                document.getElementById('timer').textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+    </script>
+</body>
+</html>

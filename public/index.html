@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoiceAI - Text to Speech Translator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <div class="brand-icon">
+                    <i data-lucide="mic-2"></i>
+                </div>
+                <span class="brand-text">VoiceAI</span>
+            </div>
+            <div class="nav-menu">
+                <a href="#home" class="nav-link active" data-section="home">
+                    <i data-lucide="home"></i>
+                    <span>Home</span>
+                </a>
+                <a href="#history" class="nav-link" data-section="history">
+                    <i data-lucide="clock"></i>
+                    <span>History</span>
+                </a>
+                <a href="#settings" class="nav-link" data-section="settings">
+                    <i data-lucide="settings"></i>
+                    <span>Settings</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Home Section -->
+        <section id="home" class="section active">
+            <div class="container">
+                <!-- Hero Area -->
+                <div class="hero-section">
+                    <h1 class="hero-title">Transform Text into Natural Speech</h1>
+                    <p class="hero-subtitle">Advanced AI-powered text-to-speech with multi-language support and crystal-clear audio quality</p>
+                </div>
+
+                <!-- Input Area -->
+                <div class="input-section">
+                    <div class="input-card glass-card">
+                        <div class="input-header">
+                            <h2 class="input-title">Enter Your Text</h2>
+                            <div class="char-counter">
+                                <span id="charCount">0</span> / 5000
+                            </div>
+                        </div>
+                        
+                        <div class="textarea-container">
+                            <textarea 
+                                id="textInput" 
+                                class="text-input"
+                                placeholder="Type or paste your text here to convert to speech..."
+                                maxlength="5000"
+                                aria-label="Text input for speech conversion"
+                            ></textarea>
+                            <div class="input-glow"></div>
+                        </div>
+
+                        <!-- Language Selection -->
+                        <div class="language-section">
+                            <h3 class="section-label">
+                                <i data-lucide="globe"></i>
+                                Select Languages
+                            </h3>
+                            <div class="language-grid" id="languageGrid">
+                                <div class="language-chip active" data-lang="en" data-name="English">
+                                    <span class="flag">🇺🇸</span>
+                                    <span class="lang-name">English</span>
+                                    <div class="chip-glow"></div>
+                                </div>
+                                <div class="language-chip" data-lang="es" data-name="Spanish">
+                                    <span class="flag">🇪🇸</span>
+                                    <span class="lang-name">Spanish</span>
+                                    <div class="chip-glow"></div>
+                                </div>
+                                <div class="language-chip" data-lang="fr" data-name="French">
+                                    <span class="flag">🇫🇷</span>
+                                    <span class="lang-name">French</span>
+                                    <div class="chip-glow"></div>
+                                </div>
+                                <div class="language-chip" data-lang="de" data-name="German">
+                                    <span class="flag">🇩🇪</span>
+                                    <span class="lang-name">German</span>
+                                    <div class="chip-glow"></div>
+                                </div>
+                                <div class="language-chip" data-lang="it" data-name="Italian">
+                                    <span class="flag">🇮🇹</span>
+                                    <span class="lang-name">Italian</span>
+                                    <div class="chip-glow"></div>
+                                </div>
+                                <div class="language-chip" data-lang="pt" data-name="Portuguese">
+                                    <span class="flag">🇵🇹</span>
+                                    <span class="lang-name">Portuguese</span>
+                                    <div class="chip-glow"></div>
+                                </div>
+                                <div class="language-chip" data-lang="ja" data-name="Japanese">
+                                    <span class="flag">🇯🇵</span>
+                                    <span class="lang-name">Japanese</span>
+                                    <div class="chip-glow"></div>
+                                </div>
+                                <div class="language-chip" data-lang="ko" data-name="Korean">
+                                    <span class="flag">🇰🇷</span>
+                                    <span class="lang-name">Korean</span>
+                                    <div class="chip-glow"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="action-buttons">
+                            <button class="btn btn-primary" id="generateBtn" disabled>
+                                <div class="btn-content">
+                                    <i data-lucide="play-circle"></i>
+                                    <span>Generate Speech</span>
+                                </div>
+                                <div class="btn-ripple"></div>
+                            </button>
+                            
+                            <div class="secondary-buttons">
+                                <button class="btn btn-secondary" id="clearBtn">
+                                    <i data-lucide="trash-2"></i>
+                                    <span>Clear</span>
+                                </button>
+                                <button class="btn btn-secondary" id="historyBtn">
+                                    <i data-lucide="clock"></i>
+                                    <span>View History</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Section -->
+                <div class="results-section" id="resultsSection">
+                    <div class="results-header">
+                        <h2 class="results-title">Generated Audio</h2>
+                        <button class="btn btn-outline" id="downloadAllBtn">
+                            <i data-lucide="download"></i>
+                            <span>Download All</span>
+                        </button>
+                    </div>
+                    <div class="results-grid" id="resultsGrid">
+                        <!-- Results will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- History Section -->
+        <section id="history" class="section">
+            <div class="container">
+                <div class="page-header">
+                    <h1 class="page-title">Translation History</h1>
+                    <button class="btn btn-outline" id="clearHistoryBtn">
+                        <i data-lucide="trash-2"></i>
+                        <span>Clear History</span>
+                    </button>
+                </div>
+                
+                <div class="history-container">
+                    <div class="history-grid" id="historyGrid">
+                        <!-- History items will be populated here -->
+                    </div>
+                    <div class="empty-state" id="emptyHistory">
+                        <div class="empty-icon">
+                            <i data-lucide="clock"></i>
+                        </div>
+                        <h3>No History Yet</h3>
+                        <p>Your translation history will appear here once you start generating speech.</p>
+                        <button class="btn btn-primary" onclick="switchSection('home')">
+                            <i data-lucide="plus"></i>
+                            <span>Create First Translation</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Settings Section -->
+        <section id="settings" class="section">
+            <div class="container">
+                <div class="page-header">
+                    <h1 class="page-title">Voice Settings</h1>
+                    <button class="btn btn-outline" id="resetSettingsBtn">
+                        <i data-lucide="rotate-ccw"></i>
+                        <span>Reset to Default</span>
+                    </button>
+                </div>
+
+                <div class="settings-grid">
+                    <!-- Voice Type -->
+                    <div class="setting-card glass-card">
+                        <div class="setting-header">
+                            <h3 class="setting-title">
+                                <i data-lucide="user"></i>
+                                Voice Type
+                            </h3>
+                        </div>
+                        <div class="voice-options">
+                            <label class="radio-option">
+                                <input type="radio" name="voiceType" value="female" checked>
+                                <div class="radio-custom">
+                                    <div class="radio-dot"></div>
+                                </div>
+                                <div class="option-content">
+                                    <span class="option-title">Female Voice</span>
+                                    <span class="option-desc">Natural and clear female voice</span>
+                                </div>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="voiceType" value="male">
+                                <div class="radio-custom">
+                                    <div class="radio-dot"></div>
+                                </div>
+                                <div class="option-content">
+                                    <span class="option-title">Male Voice</span>
+                                    <span class="option-desc">Deep and professional male voice</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Speech Speed -->
+                    <div class="setting-card glass-card">
+                        <div class="setting-header">
+                            <h3 class="setting-title">
+                                <i data-lucide="gauge"></i>
+                                Speech Speed
+                            </h3>
+                            <span class="setting-value" id="speedValue">1.0x</span>
+                        </div>
+                        <div class="slider-container">
+                            <input type="range" class="slider" id="speedSlider" min="0.5" max="2.0" step="0.1" value="1.0">
+                            <div class="slider-track">
+                                <div class="slider-fill"></div>
+                                <div class="slider-thumb"></div>
+                            </div>
+                            <div class="slider-labels">
+                                <span>0.5x</span>
+                                <span>1.0x</span>
+                                <span>2.0x</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pitch -->
+                    <div class="setting-card glass-card">
+                        <div class="setting-header">
+                            <h3 class="setting-title">
+                                <i data-lucide="music"></i>
+                                Voice Pitch
+                            </h3>
+                            <span class="setting-value" id="pitchValue">1.0</span>
+                        </div>
+                        <div class="slider-container">
+                            <input type="range" class="slider" id="pitchSlider" min="0.5" max="2.0" step="0.1" value="1.0">
+                            <div class="slider-track">
+                                <div class="slider-fill"></div>
+                                <div class="slider-thumb"></div>
+                            </div>
+                            <div class="slider-labels">
+                                <span>Low</span>
+                                <span>Normal</span>
+                                <span>High</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Volume -->
+                    <div class="setting-card glass-card">
+                        <div class="setting-header">
+                            <h3 class="setting-title">
+                                <i data-lucide="volume-2"></i>
+                                Volume
+                            </h3>
+                            <span class="setting-value" id="volumeValue">100%</span>
+                        </div>
+                        <div class="slider-container">
+                            <input type="range" class="slider" id="volumeSlider" min="0" max="100" step="5" value="100">
+                            <div class="slider-track">
+                                <div class="slider-fill"></div>
+                                <div class="slider-thumb"></div>
+                            </div>
+                            <div class="slider-labels">
+                                <span>0%</span>
+                                <span>50%</span>
+                                <span>100%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner">
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+            </div>
+            <h3 class="loading-title">Generating Speech</h3>
+            <p class="loading-subtitle">Processing your text with AI...</p>
+            <div class="loading-progress">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <span class="progress-text" id="progressText">0%</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
