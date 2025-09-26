@@ -219,6 +219,60 @@
             text-align: center;
         }
 
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            margin: 15% auto;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal h3 {
+            color: #ff4757;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .modal p {
+            color: #ffffff;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .modal-btn {
+            background: linear-gradient(45deg, #4facfe, #8e44ad);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 30px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
+        }
+
         @media (max-width: 768px) {
             .auth-container {
                 margin: 20px;
@@ -305,6 +359,15 @@
         </form>
     </div>
 
+    <!-- Error Modal -->
+    <div id="errorModal" class="modal">
+        <div class="modal-content">
+            <h3>⚠️ Account Exists</h3>
+            <p id="modalMessage">This username or email is already registered. Please try with different credentials or sign in instead.</p>
+            <button class="modal-btn" onclick="closeModal()">Got it</button>
+        </div>
+    </div>
+
     <script>
         function showSignup() {
             document.querySelector('.login-form').style.display = 'none';
@@ -314,6 +377,23 @@
         function showLogin() {
             document.querySelector('.signup-form').style.display = 'none';
             document.querySelector('.login-form').style.display = 'block';
+        }
+        
+        function showModal(message) {
+            document.getElementById('modalMessage').textContent = message;
+            document.getElementById('errorModal').style.display = 'block';
+        }
+        
+        function closeModal() {
+            document.getElementById('errorModal').style.display = 'none';
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('errorModal');
+            if (event.target === modal) {
+                closeModal();
+            }
         }
         
         function togglePassword(inputId) {
@@ -426,7 +506,11 @@
                         document.getElementById('signupSuccess').textContent = '';
                     }, 1500);
                 } else {
-                    document.getElementById('signupError').textContent = result.message || 'Signup failed';
+                    if (result.message && result.message.includes('already exists')) {
+                        showModal(result.message);
+                    } else {
+                        document.getElementById('signupError').textContent = result.message || 'Signup failed';
+                    }
                 }
             } catch (error) {
                 console.error('Signup error:', error);
