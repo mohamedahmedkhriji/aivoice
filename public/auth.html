@@ -335,7 +335,7 @@
             const password = document.getElementById('loginPassword').value;
 
             try {
-                const response = await fetch('/api/auth.php', {
+                const response = await fetch('api/auth.php', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
@@ -350,7 +350,7 @@
                 if (result.status === 'success') {
                     localStorage.setItem('userId', result.user_id);
                     localStorage.setItem('username', result.username);
-                    window.location.href = '/tts-app.html';
+                    window.location.href = 'tts-app.html';
                 } else {
                     document.getElementById('loginError').textContent = result.message;
                 }
@@ -366,7 +366,7 @@
             const password = document.getElementById('signupPassword').value;
 
             try {
-                const response = await fetch('/api/auth.php', {
+                const response = await fetch('api/auth.php', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
