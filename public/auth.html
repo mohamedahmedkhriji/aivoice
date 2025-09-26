@@ -295,7 +295,7 @@
                 </div>
             </div>
             
-            <button type="submit" class="auth-btn">Create Account</button>
+            <button type="submit" class="auth-btn" id="signupBtn">Create Account</button>
             
             <div class="switch-form">
                 Already have an account? <a onclick="showLogin()">Sign in</a>
@@ -359,6 +359,18 @@
             }
         });
 
+        // Test API connectivity first
+        async function testAPI() {
+            try {
+                const response = await fetch('test-api.php');
+                const result = await response.json();
+                console.log('API Test:', result);
+            } catch (error) {
+                console.error('API Test Failed:', error);
+            }
+        }
+        testAPI();
+
         document.getElementById('signupForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const username = document.getElementById('signupUsername').value;
@@ -366,6 +378,11 @@
             const password = document.getElementById('signupPassword').value;
 
             console.log('Signup attempt:', {username, email, password: '***'});
+            
+            // Disable button during request
+            const btn = document.getElementById('signupBtn');
+            btn.disabled = true;
+            btn.textContent = 'Creating...';
             
             document.getElementById('signupError').textContent = '';
             document.getElementById('signupSuccess').textContent = '';
@@ -396,6 +413,10 @@
             } catch (error) {
                 console.error('Signup error:', error);
                 document.getElementById('signupError').textContent = 'Signup failed. Please try again.';
+            } finally {
+                // Re-enable button
+                btn.disabled = false;
+                btn.textContent = 'Create Account';
             }
         });
     </script>
