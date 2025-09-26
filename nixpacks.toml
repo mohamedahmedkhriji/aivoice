@@ -1,6 +1,9 @@
 [phases.setup]
 nixPkgs = ['php', 'phpPackages.composer']
 
+[phases.install]
+cmds = ['composer install --ignore-platform-reqs']
+
 [phases.build]
 cmds = ['composer install --no-dev --optimize-autoloader']
 
