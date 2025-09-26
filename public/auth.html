@@ -365,6 +365,11 @@
             const email = document.getElementById('signupEmail').value;
             const password = document.getElementById('signupPassword').value;
 
+            console.log('Signup attempt:', {username, email, password: '***'});
+            
+            document.getElementById('signupError').textContent = '';
+            document.getElementById('signupSuccess').textContent = '';
+
             try {
                 const response = await fetch('api/auth.php', {
                     method: 'POST',
@@ -377,16 +382,19 @@
                     })
                 });
 
+                console.log('Response status:', response.status);
                 const result = await response.json();
+                console.log('Response data:', result);
                 
                 if (result.status === 'success') {
                     document.getElementById('signupSuccess').textContent = 'Account created! Please login.';
                     document.getElementById('signupError').textContent = '';
                     setTimeout(() => showLogin(), 2000);
                 } else {
-                    document.getElementById('signupError').textContent = result.message;
+                    document.getElementById('signupError').textContent = result.message || 'Signup failed';
                 }
             } catch (error) {
+                console.error('Signup error:', error);
                 document.getElementById('signupError').textContent = 'Signup failed. Please try again.';
             }
         });
