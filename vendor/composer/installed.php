@@ -3,7 +3,7 @@
         'name' => 'aivoice/app',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '013d8cf51bc7787c38a7271b8a9c9e42b2e4d676',
+        'reference' => '5fd0a408482d4b9a9a0a1558db01a8b6146c4b68',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'aivoice/app' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '013d8cf51bc7787c38a7271b8a9c9e42b2e4d676',
+            'reference' => '5fd0a408482d4b9a9a0a1558db01a8b6146c4b68',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

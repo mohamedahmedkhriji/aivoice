@@ -1,10 +1,10 @@
 <?php
 class Database {
-    private $host = "127.0.0.1";
+    private $host = "mysql.railway.internal";
     private $port = "3306";
-    private $db_name = "voice";
+    private $db_name = "railway";
     private $username = "root";
-    private $password = "moha";
+    private $password = "piAZrDzSpmxGyGvJNVzlRJPGVdJmLrOy";
     public $conn;
 
     public function getConnection() {
