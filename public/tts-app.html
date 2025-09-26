@@ -394,17 +394,272 @@
             background: rgba(255, 255, 255, 0.2);
         }
 
+        /* Tablet Styles */
+        @media (max-width: 1024px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .main-grid {
+                gap: 20px;
+            }
+            
+            .glass-card {
+                padding: 25px;
+            }
+        }
+
+        /* Mobile Styles */
         @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
             .main-grid {
                 grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .header {
+                margin-bottom: 25px;
+                position: relative;
             }
             
             .header h1 {
-                font-size: 2rem;
+                font-size: 2.2rem;
+                margin-bottom: 8px;
+            }
+            
+            .header p {
+                font-size: 1rem;
+            }
+            
+            .header button {
+                position: static !important;
+                margin-top: 15px;
+                width: 100%;
+            }
+            
+            .glass-card {
+                padding: 20px;
+            }
+            
+            .text-input {
+                min-height: 120px;
+                padding: 15px;
+                font-size: 15px;
             }
             
             .language-chips {
                 justify-content: center;
+                gap: 8px;
+            }
+            
+            .language-chip {
+                padding: 6px 12px;
+                font-size: 14px;
+            }
+            
+            .generate-btn {
+                padding: 12px 25px;
+                font-size: 16px;
+            }
+            
+            .audio-controls {
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            
+            .control-btn {
+                width: 45px;
+                height: 45px;
+            }
+            
+            .history-table {
+                font-size: 14px;
+            }
+            
+            .history-table th,
+            .history-table td {
+                padding: 10px 8px;
+            }
+            
+            .history-table td:first-child,
+            .history-table td:nth-child(3) {
+                max-width: 150px;
+            }
+            
+            .action-btn {
+                padding: 4px 8px;
+                font-size: 12px;
+                margin-bottom: 5px;
+                display: block;
+                width: 100%;
+            }
+            
+            .modal-content {
+                min-width: 90%;
+                padding: 25px;
+            }
+        }
+
+        /* Small Mobile Styles */
+        @media (max-width: 480px) {
+            .container {
+                padding: 8px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .header p {
+                font-size: 0.9rem;
+            }
+            
+            .glass-card {
+                padding: 15px;
+            }
+            
+            .input-section h2,
+            .results-section h2,
+            .history-section h2 {
+                font-size: 1.3rem;
+                margin-bottom: 15px;
+            }
+            
+            .text-input {
+                min-height: 100px;
+                padding: 12px;
+                font-size: 14px;
+            }
+            
+            .language-chip {
+                padding: 5px 10px;
+                font-size: 13px;
+            }
+            
+            .generate-btn {
+                padding: 10px 20px;
+                font-size: 15px;
+            }
+            
+            .voice-settings {
+                margin-top: 20px;
+            }
+            
+            .setting-group {
+                margin-bottom: 15px;
+            }
+            
+            .setting-group label {
+                font-size: 14px;
+            }
+            
+            .waveform {
+                height: 50px;
+            }
+            
+            .wave-bar {
+                width: 2px;
+            }
+            
+            .history-table {
+                font-size: 12px;
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+            
+            .history-table thead,
+            .history-table tbody,
+            .history-table th,
+            .history-table td,
+            .history-table tr {
+                display: block;
+            }
+            
+            .history-table thead tr {
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+            
+            .history-table tr {
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 10px;
+                margin-bottom: 10px;
+                padding: 10px;
+                background: rgba(255, 255, 255, 0.02);
+            }
+            
+            .history-table td {
+                border: none;
+                position: relative;
+                padding: 8px 0;
+                padding-left: 30%;
+                white-space: normal;
+                text-align: left;
+            }
+            
+            .history-table td:before {
+                content: attr(data-label);
+                position: absolute;
+                left: 6px;
+                width: 25%;
+                padding-right: 10px;
+                white-space: nowrap;
+                color: #4facfe;
+                font-weight: 600;
+            }
+            
+            .modal-content {
+                padding: 20px;
+            }
+            
+            .modal h3 {
+                font-size: 1.3rem;
+            }
+            
+            .modal p {
+                font-size: 0.9rem;
+            }
+            
+            .modal-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .modal-btn {
+                width: 100%;
+                padding: 12px;
+            }
+        }
+
+        /* Very Small Screens */
+        @media (max-width: 320px) {
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .glass-card {
+                padding: 12px;
+            }
+            
+            .language-chips {
+                gap: 5px;
+            }
+            
+            .language-chip {
+                padding: 4px 8px;
+                font-size: 12px;
+            }
+            
+            .control-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 14px;
             }
         }
 
@@ -861,11 +1116,11 @@
                     const row = document.createElement('tr');
                     const date = new Date(item.created_at).toLocaleDateString();
                     row.innerHTML = `
-                        <td style="max-width: 200px; word-wrap: break-word;">${item.original_text}</td>
-                        <td>${getLanguageFlag(item.target_language)} ${getLanguageName(item.target_language)}</td>
-                        <td>${item.translated_text}</td>
-                        <td>${date}</td>
-                        <td>
+                        <td data-label="Original Text" style="max-width: 200px; word-wrap: break-word;">${item.original_text}</td>
+                        <td data-label="Language">${getLanguageFlag(item.target_language)} ${getLanguageName(item.target_language)}</td>
+                        <td data-label="Translated Text">${item.translated_text}</td>
+                        <td data-label="Date">${date}</td>
+                        <td data-label="Actions">
                             <button class="action-btn" onclick="playFromHistory('${item.translated_text}', '${item.target_language}', '${item.voice_type}', ${item.pitch}, ${item.speed})">Play</button>
                             <button class="action-btn delete-btn" onclick="deleteFromHistory(${item.id})">Delete</button>
                         </td>
