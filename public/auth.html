@@ -404,9 +404,15 @@
                 console.log('Response data:', result);
                 
                 if (result.status === 'success') {
-                    document.getElementById('signupSuccess').textContent = 'Account created! Please login.';
+                    document.getElementById('signupSuccess').textContent = 'Account created! Redirecting to login...';
                     document.getElementById('signupError').textContent = '';
-                    setTimeout(() => showLogin(), 2000);
+                    // Clear form
+                    document.getElementById('signupForm').reset();
+                    // Redirect to login form
+                    setTimeout(() => {
+                        showLogin();
+                        document.getElementById('signupSuccess').textContent = '';
+                    }, 1500);
                 } else {
                     document.getElementById('signupError').textContent = result.message || 'Signup failed';
                 }
