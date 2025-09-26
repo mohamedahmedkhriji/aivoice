@@ -273,6 +273,31 @@
             box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
         }
 
+        .back-arrow {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(79, 172, 254, 0.3);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #4facfe;
+            font-size: 20px;
+        }
+
+        .back-arrow:hover {
+            background: rgba(79, 172, 254, 0.2);
+            transform: translateX(-3px);
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.3);
+        }
+
         @media (max-width: 768px) {
             .auth-container {
                 margin: 20px;
@@ -327,6 +352,9 @@
 
         <!-- Signup Form -->
         <form id="signupForm" class="signup-form">
+            <div class="back-arrow" onclick="showLogin()" title="Back to Login">
+                ←
+            </div>
             <div class="welcome-text">
                 <h2>Create Account</h2>
                 <p>Join the AI Voice community</p>
