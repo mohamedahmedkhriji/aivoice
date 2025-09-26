@@ -388,6 +388,7 @@
             document.getElementById('signupSuccess').textContent = '';
 
             try {
+                console.log('Sending request to api/auth.php');
                 const response = await fetch('api/auth.php', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
@@ -400,8 +401,19 @@
                 });
 
                 console.log('Response status:', response.status);
-                const result = await response.json();
-                console.log('Response data:', result);
+                console.log('Response headers:', response.headers);
+                
+                const responseText = await response.text();
+                console.log('Raw response:', responseText);
+                
+                let result;
+                try {
+                    result = JSON.parse(responseText);
+                } catch (parseError) {
+                    console.error('JSON parse error:', parseError);
+                    throw new Error('Invalid server response');
+                }
+                console.log('Parsed response:', result);
                 
                 if (result.status === 'success') {
                     document.getElementById('signupSuccess').textContent = 'Account created! Redirecting to login...';

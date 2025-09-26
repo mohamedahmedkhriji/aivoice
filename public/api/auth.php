@@ -25,8 +25,19 @@ if (!isset($data['action'])) {
 try {
     $db = new Database();
     $conn = $db->getConnection();
+    
+    if (!$conn) {
+        echo json_encode(['status' => 'error', 'message' => 'Database connection failed']);
+        exit;
+    }
 
     if ($data['action'] === 'signup') {
+        // Validate required fields
+        if (empty($data['username']) || empty($data['email']) || empty($data['password'])) {
+            echo json_encode(['status' => 'error', 'message' => 'All fields are required']);
+            exit;
+        }
+        
         // Check if user exists
         $stmt = $conn->prepare("SELECT id FROM users WHERE username = ? OR email = ?");
         $stmt->execute([$data['username'], $data['email']]);
@@ -39,9 +50,12 @@ try {
         // Create user
         $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
         $stmt = $conn->prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)");
-        $stmt->execute([$data['username'], $data['email'], $hashedPassword]);
         
-        echo json_encode(['status' => 'success', 'message' => 'Account created successfully']);
+        if ($stmt->execute([$data['username'], $data['email'], $hashedPassword])) {
+            echo json_encode(['status' => 'success', 'message' => 'Account created successfully']);
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Failed to create account']);
+        }
     }
     
     if ($data['action'] === 'login') {
