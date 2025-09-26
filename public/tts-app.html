@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Voice - Text-to-Speech Translator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@google-cloud/translate@8.0.2/build/browser/translate.min.js"></script>
+    <script>
+        // Simple translation function using MyMemory API (free)
+        async function translateText(text, targetLang) {
+            try {
+                const response = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|${targetLang}`);
+                const data = await response.json();
+                return data.responseData.translatedText;
+            } catch (error) {
+                console.error('Translation error:', error);
+                return text; // Return original text if translation fails
+            }
+        }
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #4facfe, #00f2fe, #8e44ad);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #a0a0a0;
+            font-size: 1.1rem;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .input-section h2 {
+            color: #4facfe;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .text-input {
+            width: 100%;
+            min-height: 150px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(79, 172, 254, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            color: #ffffff;
+            font-size: 16px;
+            resize: vertical;
+            transition: all 0.3s ease;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 20px rgba(79, 172, 254, 0.3);
+        }
+
+        .language-selector {
+            margin: 20px 0;
+        }
+
+        .language-selector label {
+            display: block;
+            margin-bottom: 10px;
+            color: #a0a0a0;
+        }
+
+        .language-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .language-chip {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .language-chip:hover {
+            background: rgba(79, 172, 254, 0.2);
+            border-color: #4facfe;
+        }
+
+        .language-chip.selected {
+            background: linear-gradient(45deg, #4facfe, #8e44ad);
+            border-color: transparent;
+        }
+
+        .generate-btn {
+            width: 100%;
+            background: linear-gradient(45deg, #4facfe, #8e44ad);
+            border: none;
+            border-radius: 15px;
+            padding: 15px 30px;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(79, 172, 254, 0.4);
+        }
+
+        .results-section {
+            display: none;
+        }
+
+        .results-section.active {
+            display: block;
+        }
+
+        .translated-text {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .audio-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            background: rgba(79, 172, 254, 0.3);
+            border-color: #4facfe;
+        }
+
+        .waveform {
+            height: 60px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .wave-bars {
+            display: flex;
+            gap: 2px;
+            align-items: center;
+        }
+
+        .wave-bar {
+            width: 3px;
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            border-radius: 2px;
+            animation: wave 1.5s ease-in-out infinite;
+        }
+
+        @keyframes wave {
+            0%, 100% { height: 10px; }
+            50% { height: 30px; }
+        }
+
+        .voice-settings {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .setting-group {
+            margin-bottom: 20px;
+        }
+
+        .setting-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #a0a0a0;
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(45deg, #4facfe, #8e44ad);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .history-section {
+            margin-top: 40px;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .history-table th,
+        .history-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            vertical-align: top;
+        }
+        
+        .history-table td:first-child,
+        .history-table td:nth-child(3) {
+            max-width: 250px;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+        }
+
+        .history-table th {
+            background: rgba(79, 172, 254, 0.2);
+            color: #4facfe;
+        }
+
+        .action-btn {
+            background: rgba(79, 172, 254, 0.2);
+            border: 1px solid #4facfe;
+            border-radius: 8px;
+            padding: 5px 10px;
+            color: #4facfe;
+            cursor: pointer;
+            margin-right: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: #4facfe;
+            color: white;
+        }
+        
+        .delete-btn {
+            background: rgba(255, 59, 48, 0.2);
+            border-color: #ff3b30;
+            color: #ff3b30;
+        }
+        
+        .delete-btn:hover {
+            background: #ff3b30;
+            color: white;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+        }
+        
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            text-align: center;
+            min-width: 400px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal h3 {
+            color: #ff3b30;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        
+        .modal p {
+            color: #a0a0a0;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+        
+        .modal-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .confirm-btn {
+            background: linear-gradient(45deg, #ff3b30, #ff6b6b);
+            color: white;
+        }
+        
+        .confirm-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 59, 48, 0.4);
+        }
+        
+        .cancel-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        
+        .cancel-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .language-chips {
+                justify-content: center;
+            }
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(79, 172, 254, 0.3);
+            border-top: 3px solid #4facfe;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>AI Voice Translator</h1>
+            <p>Transform text into speech across multiple languages</p>
+            <button onclick="logout()" style="position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px 20px; border-radius: 10px; cursor: pointer;">Logout</button>
+        </div>
+
+        <div class="main-grid">
+            <div class="glass-card input-section">
+                <h2>Enter Your Text</h2>
+                <textarea class="text-input" id="inputText" placeholder="Type your text here..."></textarea>
+                
+                <div class="language-selector">
+                    <label>Select Target Language:</label>
+                    <div class="language-chips">
+                        <div class="language-chip selected" data-lang="en">🇺🇸 English</div>
+                        <div class="language-chip" data-lang="es">🇪🇸 Spanish</div>
+                        <div class="language-chip" data-lang="fr">🇫🇷 French</div>
+                        <div class="language-chip" data-lang="de">🇩🇪 German</div>
+                        <div class="language-chip" data-lang="it">🇮🇹 Italian</div>
+                        <div class="language-chip" data-lang="pt">🇵🇹 Portuguese</div>
+                    </div>
+                </div>
+
+                <button class="generate-btn" onclick="generateSpeech()">Generate Speech</button>
+            </div>
+
+            <div class="glass-card">
+                <h2>Voice Settings</h2>
+                <div class="voice-settings">
+
+                    
+                    <div class="setting-group">
+                        <label>Pitch: <span id="pitchValue">1.0</span></label>
+                        <input type="range" class="slider" id="pitch" min="0.5" max="2" step="0.1" value="1">
+                    </div>
+                    
+                    <div class="setting-group">
+                        <label>Speed: <span id="speedValue">1.0</span></label>
+                        <input type="range" class="slider" id="speed" min="0.5" max="2" step="0.1" value="1">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card results-section" id="resultsSection">
+            <h2>Results</h2>
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Generating speech...</p>
+            </div>
+            
+            <div id="translatedContent"></div>
+            
+            <div class="audio-controls">
+                <button class="control-btn" id="playBtn" onclick="togglePlay()">▶️</button>
+                <button class="control-btn" id="stopBtn" onclick="stopAudio()">⏹️</button>
+                <span id="timer">00:00</span>
+            </div>
+            
+            <div class="waveform">
+                <div class="wave-bars" id="waveBars"></div>
+            </div>
+        </div>
+
+        <div class="glass-card history-section">
+            <h2>Translation History</h2>
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>Original Text</th>
+                        <th>Language</th>
+                        <th>Translated Text</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="historyTable">
+                    <tr>
+                        <td>Hello world</td>
+                        <td>🇪🇸 Spanish</td>
+                        <td>Hola mundo</td>
+                        <td>2024-01-15</td>
+                        <td>
+                            <button class="action-btn">Play</button>
+                            <button class="action-btn">Download</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <h3>🗑️ Delete Voice History</h3>
+            <p>Are you sure you want to delete this voice recording?<br>This action cannot be undone.</p>
+            <div class="modal-buttons">
+                <button class="modal-btn confirm-btn" onclick="confirmDelete()">Yes, Delete</button>
+                <button class="modal-btn cancel-btn" onclick="closeDeleteModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedLanguages = ['en']; // Default to English
+        let currentAudio = null;
+        let isPlaying = false;
+
+        // Language selection (only one language allowed)
+        document.querySelectorAll('.language-chip').forEach(chip => {
+            chip.addEventListener('click', function() {
+                const lang = this.dataset.lang;
+                
+                // Remove selection from all chips
+                document.querySelectorAll('.language-chip').forEach(c => c.classList.remove('selected'));
+                
+                // Select current chip
+                this.classList.add('selected');
+                selectedLanguages = [lang];
+            });
+        });
+
+        // Voice settings
+        document.getElementById('pitch').addEventListener('input', function() {
+            document.getElementById('pitchValue').textContent = this.value;
+        });
+
+        document.getElementById('speed').addEventListener('input', function() {
+            document.getElementById('speedValue').textContent = this.value;
+        });
+
+        // Generate speech function
+        async function generateSpeech() {
+            const text = document.getElementById('inputText').value;
+            if (!text) {
+                alert('Please enter text');
+                return;
+            }
+
+            document.getElementById('resultsSection').classList.add('active');
+            document.getElementById('loading').classList.add('active');
+
+            // Get voice settings
+            const voiceType = 'female'; // Default to female voice
+            const pitch = parseFloat(document.getElementById('pitch').value);
+            const speed = parseFloat(document.getElementById('speed').value);
+            const targetLang = selectedLanguages[0];
+
+            try {
+                // Translate text if not English
+                let translatedText = text;
+                if (targetLang !== 'en') {
+                    translatedText = await translateText(text, targetLang);
+                }
+                
+                document.getElementById('loading').classList.remove('active');
+                
+                const langNames = {
+                    'en': 'English',
+                    'es': 'Spanish',
+                    'fr': 'French', 
+                    'de': 'German',
+                    'it': 'Italian',
+                    'pt': 'Portuguese'
+                };
+                
+                const translatedContent = `
+                    <div class="translated-text">
+                        <h3>${langNames[targetLang]}</h3>
+                        <p>${translatedText}</p>
+                    </div>
+                `;
+                
+                document.getElementById('translatedContent').innerHTML = translatedContent;
+                generateWaveform();
+                
+                // Store for replay
+                lastTranslatedText = translatedText;
+                lastTargetLang = targetLang;
+                
+                // Generate speech for the translated text
+                generateTTS(translatedText, targetLang, voiceType, pitch, speed);
+                
+                // Add to history
+                addToHistory(text, targetLang, translatedText);
+                
+            } catch (error) {
+                document.getElementById('loading').classList.remove('active');
+                alert('Translation failed. Please try again.');
+            }
+        }
+        
+        // Text-to-Speech function
+        function generateTTS(text, language, voiceType, pitch, speed) {
+            if ('speechSynthesis' in window) {
+                // Stop any ongoing speech
+                speechSynthesis.cancel();
+                
+                const utterance = new SpeechSynthesisUtterance(text);
+                
+                // Set language codes
+                const langCodes = {
+                    'en': 'en-US',
+                    'es': 'es-ES',
+                    'fr': 'fr-FR',
+                    'de': 'de-DE',
+                    'it': 'it-IT',
+                    'pt': 'pt-PT'
+                };
+                utterance.lang = langCodes[language] || 'en-US';
+                
+                // Set voice settings
+                utterance.pitch = pitch;
+                utterance.rate = speed;
+                utterance.volume = 1;
+                
+                // Find the best voice based on language and gender
+                const voices = speechSynthesis.getVoices();
+                const targetLangCode = langCodes[language] || 'en-US';
+                const langPrefix = targetLangCode.split('-')[0];
+                
+                // Filter voices by language first
+                const languageVoices = voices.filter(voice => 
+                    voice.lang.toLowerCase().startsWith(langPrefix) || 
+                    voice.lang.toLowerCase().startsWith(targetLangCode.toLowerCase())
+                );
+                
+                // Find voice by gender preference
+                let selectedVoice = null;
+                
+                if (voiceType === 'female') {
+                    // Look for female voices
+                    selectedVoice = languageVoices.find(voice => {
+                        const name = voice.name.toLowerCase();
+                        return name.includes('female') || name.includes('woman') || 
+                               name.includes('samantha') || name.includes('susan') || 
+                               name.includes('karen') || name.includes('moira') ||
+                               name.includes('fiona') || name.includes('tessa') ||
+                               name.includes('veena') || name.includes('rishi');
+                    });
+                    
+                    // Fallback: use first available voice for the language
+                    if (!selectedVoice && languageVoices.length > 0) {
+                        selectedVoice = languageVoices[0];
+                    }
+                } else {
+                    // Look for male voices
+                    selectedVoice = languageVoices.find(voice => {
+                        const name = voice.name.toLowerCase();
+                        return name.includes('male') || name.includes('man') || 
+                               name.includes('daniel') || name.includes('alex') || 
+                               name.includes('fred') || name.includes('jorge') ||
+                               name.includes('diego') || name.includes('thomas') ||
+                               name.includes('rishi') || name.includes('aaron');
+                    });
+                    
+                    // Fallback: use second available voice or first if only one exists
+                    if (!selectedVoice && languageVoices.length > 1) {
+                        selectedVoice = languageVoices[1];
+                    } else if (!selectedVoice && languageVoices.length > 0) {
+                        selectedVoice = languageVoices[0];
+                    }
+                }
+                
+                // Final fallback: use any available voice
+                if (!selectedVoice && voices.length > 0) {
+                    selectedVoice = voices[0];
+                }
+                
+                if (selectedVoice) {
+                    utterance.voice = selectedVoice;
+                    console.log(`Selected voice: ${selectedVoice.name} (${selectedVoice.lang}) for ${voiceType} voice`);
+                }
+                
+                // Store current utterance
+                currentAudio = utterance;
+                
+                // Event handlers
+                utterance.onstart = () => {
+                    isPlaying = true;
+                    document.getElementById('playBtn').textContent = '⏸️';
+                    startTimer();
+                    animateWaveform(true);
+                };
+                
+                utterance.onend = () => {
+                    isPlaying = false;
+                    document.getElementById('playBtn').textContent = '▶️';
+                    animateWaveform(false);
+                };
+                
+                utterance.onerror = (event) => {
+                    console.error('Speech synthesis error:', event.error);
+                    isPlaying = false;
+                    document.getElementById('playBtn').textContent = '▶️';
+                    animateWaveform(false);
+                };
+                
+                // Speak the text
+                speechSynthesis.speak(utterance);
+            } else {
+                alert('Text-to-speech not supported in this browser');
+            }
+        }
+
+        // Store last translated text for replay
+        let lastTranslatedText = '';
+        let lastTargetLang = 'en';
+
+        function generateWaveform() {
+            const waveBars = document.getElementById('waveBars');
+            waveBars.innerHTML = '';
+            
+            for (let i = 0; i < 50; i++) {
+                const bar = document.createElement('div');
+                bar.className = 'wave-bar';
+                bar.style.animationDelay = `${i * 0.1}s`;
+                bar.style.height = `${Math.random() * 30 + 10}px`;
+                waveBars.appendChild(bar);
+            }
+        }
+        
+        function animateWaveform(animate) {
+            const waveBars = document.querySelectorAll('.wave-bar');
+            waveBars.forEach(bar => {
+                if (animate) {
+                    bar.style.animationPlayState = 'running';
+                } else {
+                    bar.style.animationPlayState = 'paused';
+                }
+            });
+        }
+
+        function togglePlay() {
+            const playBtn = document.getElementById('playBtn');
+            if (isPlaying) {
+                playBtn.textContent = '▶️';
+                isPlaying = false;
+                speechSynthesis.cancel();
+                animateWaveform(false);
+            } else {
+                // Replay the last generated speech
+                if (lastTranslatedText) {
+                    const voiceType = 'female'; // Default to female voice
+                    const pitch = parseFloat(document.getElementById('pitch').value);
+                    const speed = parseFloat(document.getElementById('speed').value);
+                    generateTTS(lastTranslatedText, lastTargetLang, voiceType, pitch, speed);
+                }
+            }
+        }
+
+        function stopAudio() {
+            document.getElementById('playBtn').textContent = '▶️';
+            isPlaying = false;
+            document.getElementById('timer').textContent = '00:00';
+            speechSynthesis.cancel();
+            animateWaveform(false);
+        }
+
+
+
+        function startTimer() {
+            let seconds = 0;
+            const timer = setInterval(() => {
+                if (!isPlaying) {
+                    clearInterval(timer);
+                    return;
+                }
+                seconds++;
+                const mins = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                document.getElementById('timer').textContent = 
+                    `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        async function addToHistory(original, lang, translated) {
+            const userId = localStorage.getItem('userId');
+            if (!userId) {
+                window.location.href = '/auth.html';
+                return;
+            }
+            
+            const voiceType = 'female'; // Default to female voice
+            const pitch = document.getElementById('pitch').value;
+            const speed = document.getElementById('speed').value;
+            
+            try {
+                await fetch('/api/voice-history.php', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        user_id: userId,
+                        original_text: original,
+                        target_language: lang,
+                        translated_text: translated,
+                        voice_type: voiceType,
+                        pitch: parseFloat(pitch),
+                        speed: parseFloat(speed)
+                    })
+                });
+                loadHistory();
+            } catch (error) {
+                console.error('Error saving to history:', error);
+            }
+        }
+        
+        async function loadHistory() {
+            const userId = localStorage.getItem('userId');
+            if (!userId) {
+                window.location.href = '/auth.html';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/voice-history.php?user_id=${userId}`);
+                const history = await response.json();
+                const tbody = document.getElementById('historyTable');
+                tbody.innerHTML = '';
+                
+                history.forEach(item => {
+                    const row = document.createElement('tr');
+                    const date = new Date(item.created_at).toLocaleDateString();
+                    row.innerHTML = `
+                        <td style="max-width: 200px; word-wrap: break-word;">${item.original_text}</td>
+                        <td>${getLanguageFlag(item.target_language)} ${getLanguageName(item.target_language)}</td>
+                        <td>${item.translated_text}</td>
+                        <td>${date}</td>
+                        <td>
+                            <button class="action-btn" onclick="playFromHistory('${item.translated_text}', '${item.target_language}', '${item.voice_type}', ${item.pitch}, ${item.speed})">Play</button>
+                            <button class="action-btn delete-btn" onclick="deleteFromHistory(${item.id})">Delete</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error loading history:', error);
+            }
+        }
+        
+        function getLanguageFlag(lang) {
+            const flags = {'en': '🇺🇸', 'es': '🇪🇸', 'fr': '🇫🇷', 'de': '🇩🇪', 'it': '🇮🇹', 'pt': '🇵🇹'};
+            return flags[lang] || '🌐';
+        }
+        
+        function getLanguageName(lang) {
+            const names = {'en': 'English', 'es': 'Spanish', 'fr': 'French', 'de': 'German', 'it': 'Italian', 'pt': 'Portuguese'};
+            return names[lang] || lang;
+        }
+        
+        // Check authentication and load history
+        window.onload = function() {
+            const userId = localStorage.getItem('userId');
+            const username = localStorage.getItem('username');
+            
+            if (!userId) {
+                window.location.href = '/auth.html';
+                return;
+            }
+            
+            // Show username in header
+            document.querySelector('.header p').textContent = `Welcome, ${username}!`;
+            loadHistory();
+            
+            // Load voices when page loads
+            if ('speechSynthesis' in window) {
+                speechSynthesis.onvoiceschanged = () => {
+                    // Voices are now loaded
+                };
+            }
+        };
+        
+        function logout() {
+            localStorage.removeItem('userId');
+            localStorage.removeItem('username');
+            window.location.href = '/auth.html';
+        }
+
+        function playFromHistory(text, language, voiceType, pitch, speed) {
+            // Stop any current playback
+            stopAudio();
+            
+            // Show results section and generate waveform
+            document.getElementById('resultsSection').classList.add('active');
+            generateWaveform();
+            
+            // Update translated content display
+            const langNames = {
+                'en': 'English',
+                'es': 'Spanish', 
+                'fr': 'French',
+                'de': 'German',
+                'it': 'Italian',
+                'pt': 'Portuguese'
+            };
+            
+            const translatedContent = `
+                <div class="translated-text">
+                    <h3>${langNames[language]} (From History)</h3>
+                    <p>${text}</p>
+                </div>
+            `;
+            
+            document.getElementById('translatedContent').innerHTML = translatedContent;
+            
+            // Store for current session
+            lastTranslatedText = text;
+            lastTargetLang = language;
+            
+            // Play the audio with stored settings
+            generateTTS(text, language, voiceType, pitch, speed);
+        }
+        
+        let deleteItemId = null;
+        
+        function deleteFromHistory(id) {
+            deleteItemId = id;
+            document.getElementById('deleteModal').style.display = 'block';
+        }
+        
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').style.display = 'none';
+            deleteItemId = null;
+        }
+        
+        async function confirmDelete() {
+            if (!deleteItemId) return;
+            
+            try {
+                const response = await fetch('/api/voice-history.php', {
+                    method: 'DELETE',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ id: deleteItemId })
+                });
+                
+                if (response.ok) {
+                    closeDeleteModal();
+                    loadHistory(); // Reload the history table
+                } else {
+                    alert('Failed to delete item. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error deleting item:', error);
+                alert('Error deleting item. Please try again.');
+            }
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('deleteModal');
+            if (event.target === modal) {
+                closeDeleteModal();
+            }
+        }
+
+
+    </script>
+</body>
+</html>

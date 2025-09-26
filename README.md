@@ -54,15 +54,15 @@ A modern, futuristic text-to-speech application built with Laravel, featuring a 
    ```
 
 5. **Database configuration:**
-   - Create MySQL database named `laravel_app`
+   - Create MySQL database named `voice`
    - Update `.env` file with your database credentials:
    ```env
    DB_CONNECTION=mysql
    DB_HOST=127.0.0.1
    DB_PORT=3306
-   DB_DATABASE=laravel_app
-   DB_USERNAME=your_username
-   DB_PASSWORD=your_password
+   DB_DATABASE=voice
+   DB_USERNAME=root
+   DB_PASSWORD=moha
    ```
 
 6. **Run database migrations:**
