@@ -352,7 +352,7 @@
             <button type="submit" class="auth-btn" id="signupBtn">Create Account</button>
             
             <div class="switch-form">
-                Already have an account? <a onclick="showLogin()">Sign in</a>
+                Already have an account? <a href="#" onclick="showLogin(); return false;" style="color: #4facfe; text-decoration: none; cursor: pointer;">Sign in</a>
             </div>
             <div id="signupError" class="error"></div>
             <div id="signupSuccess" class="success"></div>
@@ -378,6 +378,7 @@
         }
 
         function showLogin() {
+            console.log('Switching to login form');
             document.querySelector('.signup-form').style.display = 'none';
             document.querySelector('.login-form').style.display = 'block';
         }
